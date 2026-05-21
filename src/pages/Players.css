@@ -1,0 +1,361 @@
+/* ── Page layout ───────────────────────────────────────────── */
+
+.players-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #000000;
+  padding: 0 20px 40px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Deadline banner ───────────────────────────────────────── */
+
+.deadline-banner {
+  width: 100%;
+  max-width: 480px;
+  background: #111111;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 20px 0 0;
+  color: #bfbfbf;
+  font-size: 0.8125rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.deadline-banner strong {
+  color: #ffffff;
+}
+
+.deadline-banner--locked {
+  border-color: #7f1d1d;
+  background: #1a0000;
+  color: #fca5a5;
+}
+
+/* ── Header ────────────────────────────────────────────────── */
+
+.players-header {
+  text-align: center;
+  margin: 24px 0 16px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.players-title {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: clamp(1.75rem, 9vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.players-subtitle {
+  margin: 0;
+  color: #bfbfbf;
+  font-size: 0.9rem;
+}
+
+/* ── Stats bar ─────────────────────────────────────────────── */
+
+.players-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 16px;
+}
+
+.pstat {
+  background: #111111;
+  border: 1px solid #222;
+  border-radius: 10px;
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.pstat-label {
+  color: #6b6b6b;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.pstat-value {
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.pstat--tier1 .pstat-value { color: #f87171; }
+.pstat--tier2 .pstat-value { color: #facc15; }
+.pstat--tier3 .pstat-value { color: #22c55e; }
+
+/* ── Tier filter tabs ──────────────────────────────────────── */
+
+.tier-filters {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tier-filter-btn {
+  flex: 1;
+  min-width: 70px;
+  padding: 8px 10px;
+  border: 1px solid #222;
+  border-radius: 10px;
+  background: #111111;
+  color: #6b6b6b;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.tier-filter-btn:hover {
+  background: #1a1a1a;
+  color: #bfbfbf;
+}
+
+.tier-filter-btn--active {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #ffffff;
+}
+
+/* ── Empty state ───────────────────────────────────────────── */
+
+.players-empty {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.players-empty p {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.players-empty-hint {
+  color: #555 !important;
+  font-size: 0.8125rem !important;
+  font-weight: 400 !important;
+}
+
+/* ── Player list ───────────────────────────────────────────── */
+
+.players-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-card {
+  background: #111111;
+  border: 1px solid #222222;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: border-color 0.2s ease;
+}
+
+.player-card--added {
+  border-color: #166534;
+  background: #0a1a0e;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.player-name {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Goalkeeper warning ────────────────────────────────────── */
+
+.gk-warning {
+  width: 100%;
+  max-width: 480px;
+  background: #1a0000;
+  border: 1px solid #dc2626;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  color: #fca5a5;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.gk-hint {
+  width: 100%;
+  max-width: 480px;
+  background: #1a1200;
+  border: 1px solid #ca8a04;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  color: #fbbf24;
+  font-size: 0.8125rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* ── Tier badges ───────────────────────────────────────────── */
+
+.tier-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tier-badge--1 {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.tier-badge--2 {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.tier-badge--3 {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* ── Role badges ───────────────────────────────────────────── */
+
+.player-badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.role-badge--portiere {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.role-badge--giocatore {
+  background: rgba(34, 197, 94, 0.1);
+  color: #86efac;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+
+.player-actions {
+  flex-shrink: 0;
+}
+
+.player-btn {
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.player-btn--add {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.player-btn--add:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.player-btn--add:disabled {
+  background: #1f1f1f;
+  color: #444;
+  cursor: not-allowed;
+  font-size: 0.7rem;
+  padding: 8px 10px;
+}
+
+.player-btn--remove {
+  background: #1a0000;
+  color: #f87171;
+  border: 1px solid #7f1d1d;
+  padding: 8px 12px;
+}
+
+.player-btn--remove:hover:not(:disabled) {
+  background: #2d0000;
+}
+
+.player-btn--remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.player-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}

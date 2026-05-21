@@ -1,0 +1,283 @@
+/* ── Page ──────────────────────────────────────────────────── */
+
+.team-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #000000;
+  padding: 0 20px 40px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Deadline banner ───────────────────────────────────────── */
+
+.team-deadline {
+  width: 100%;
+  max-width: 480px;
+  background: #111111;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 20px 0 0;
+  color: #bfbfbf;
+  font-size: 0.8125rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.team-deadline strong { color: #ffffff; }
+
+.team-deadline--locked {
+  border-color: #7f1d1d;
+  background: #1a0000;
+  color: #fca5a5;
+}
+
+/* ── Header ────────────────────────────────────────────────── */
+
+.team-header {
+  text-align: center;
+  margin: 24px 0 16px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.team-title {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: clamp(1.75rem, 9vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.team-subtitle {
+  margin: 0;
+  color: #bfbfbf;
+  font-size: 0.9rem;
+}
+
+/* ── Summary pills ─────────────────────────────────────────── */
+
+.team-summary {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+}
+
+.team-summary-pill {
+  background: #111111;
+  border: 1px solid #222;
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: #bfbfbf;
+  font-size: 0.8125rem;
+}
+
+.team-summary-pill strong {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.team-summary-pill--tier1 strong { color: #f87171; }
+.team-summary-pill--tier2 strong { color: #facc15; }
+.team-summary-pill--tier3 strong { color: #22c55e; }
+
+/* ── Sections ──────────────────────────────────────────────── */
+
+.team-section {
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 24px;
+}
+
+.section-label {
+  margin: 0 0 10px;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.section-label--reserve {
+  color: #bfbfbf;
+}
+
+.slot-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Slots ─────────────────────────────────────────────────── */
+
+.player-slot {
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  box-sizing: border-box;
+}
+
+.player-slot--empty {
+  background: #0a0a0a;
+  border: 1px dashed #2a2a2a;
+}
+
+.slot-empty-label {
+  color: #333;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.player-slot--filled {
+  background: #111111;
+  border: 1px solid #222;
+}
+
+.slot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.slot-name {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Badge row ─────────────────────────────────────────────── */
+
+.slot-badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* ── Role badges (team) ────────────────────────────────────── */
+
+.team-role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.team-role-badge--portiere {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.team-role-badge--giocatore {
+  background: rgba(34, 197, 94, 0.1);
+  color: #86efac;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+/* ── Tier badges (team) ────────────────────────────────────── */
+
+.team-tier-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.team-tier-badge--1 {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.team-tier-badge--2 {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.team-tier-badge--3 {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* ── Remove button ─────────────────────────────────────────── */
+
+.slot-remove-btn {
+  flex-shrink: 0;
+  background: #1a0000;
+  border: 1px solid #7f1d1d;
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 0.75rem;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.slot-remove-btn:hover {
+  background: #2d0000;
+}
+
+/* ── CTA button ────────────────────────────────────────────── */
+
+.team-cta-btn {
+  width: 100%;
+  max-width: 480px;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  background: #22c55e;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.team-cta-btn:hover {
+  background: #16a34a;
+}
+
+.team-cta-btn:active {
+  transform: scale(0.98);
+}
+
+@media (min-width: 480px) {
+  .team-page { padding-top: 0; }
+  .team-cta-btn { padding: 18px; font-size: 1rem; }
+}

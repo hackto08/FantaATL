@@ -1,0 +1,122 @@
+.gamehome-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #000000;
+  padding: 48px 24px 32px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.gamehome-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.gamehome-title {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: clamp(2.5rem, 12vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.gamehome-subtitle {
+  margin: 0;
+  color: #bfbfbf;
+  font-size: clamp(0.9375rem, 4vw, 1.0625rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.gamehome-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.gamehome-card--link {
+  cursor: pointer;
+}
+
+.gamehome-card {
+  background: #111111;
+  border: 1px solid #222222;
+  border-radius: 18px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.gamehome-card:hover {
+  background: #161616;
+  border-color: #22c55e;
+  transform: translateY(-2px);
+}
+
+.gamehome-card:active {
+  transform: translateY(0);
+}
+
+.card-emoji {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.card-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.card-description {
+  margin: 0;
+  color: #6b6b6b;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.gamehome-card--admin {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.06);
+}
+
+.gamehome-card--admin .card-title {
+  color: #22c55e;
+}
+
+@media (min-width: 480px) {
+  .gamehome-page {
+    padding-top: 64px;
+  }
+
+  .gamehome-cards {
+    gap: 20px;
+  }
+
+  .gamehome-card {
+    padding: 32px 28px;
+  }
+}

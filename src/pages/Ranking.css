@@ -1,0 +1,160 @@
+.ranking-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #000000;
+  padding: 48px 20px 40px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ranking-header {
+  text-align: center;
+  margin-bottom: 32px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.ranking-title {
+  margin: 0 0 10px;
+  color: #ffffff;
+  font-size: clamp(2rem, 10vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.ranking-subtitle {
+  margin: 0;
+  color: #bfbfbf;
+  font-size: clamp(0.875rem, 3.5vw, 0.9375rem);
+}
+
+/* ── List ──────────────────────────────────────────────────── */
+
+.ranking-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ranking-card {
+  background: #111111;
+  border: 1px solid #222222;
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.ranking-card:hover {
+  background: #161616;
+  transform: translateY(-1px);
+}
+
+/* ── Podium highlights ─────────────────────────────────────── */
+
+.rank--gold {
+  border-color: #a16207;
+  background: #0f0a00;
+}
+
+.rank--gold:hover {
+  background: #1a1100;
+}
+
+.rank--silver {
+  border-color: #475569;
+  background: #0a0c10;
+}
+
+.rank--silver:hover {
+  background: #0f1218;
+}
+
+.rank--bronze {
+  border-color: #7c3d12;
+  background: #0f0800;
+}
+
+.rank--bronze:hover {
+  background: #1a1000;
+}
+
+/* ── Cell styles ───────────────────────────────────────────── */
+
+.rank-pos {
+  font-size: 1.125rem;
+  font-weight: 700;
+  min-width: 36px;
+  color: #bfbfbf;
+  flex-shrink: 0;
+}
+
+.rank--gold   .rank-pos { color: #fbbf24; }
+.rank--silver .rank-pos { color: #94a3b8; }
+.rank--bronze .rank-pos { color: #f97316; }
+
+.rank-nickname {
+  flex: 1;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rank-points {
+  color: #22c55e;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ranking-empty {
+  text-align: center;
+  padding: 48px 20px;
+}
+
+.ranking-empty p {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ranking-empty-hint {
+  color: #555 !important;
+  font-size: 0.8125rem !important;
+  font-weight: 400 !important;
+}
+
+@media (min-width: 480px) {
+  .ranking-page {
+    padding-top: 64px;
+  }
+
+  .ranking-card {
+    padding: 18px 24px;
+  }
+}
