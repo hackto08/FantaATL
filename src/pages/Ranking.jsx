@@ -3,6 +3,8 @@ import { supabase } from '../supabase'
 import { getCurrentUser } from '../utils/auth'
 import './Ranking.css'
 
+const STARTER_COLS = ['goalkeeper', 'player1', 'player2', 'player3', 'player4']
+
 const MEDALS     = { 1: '🥇', 2: '🥈', 3: '🥉' }
 const RANK_CLASS = { 1: 'rank--gold', 2: 'rank--silver', 3: 'rank--bronze' }
 
@@ -12,17 +14,15 @@ function Ranking() {
 
   useEffect(() => {
     async function buildRanking() {
-      // Debug: who is currently logged in (does NOT affect the query)
-      const currentUser = getCurrentUser()
-      console.log('currentUser (logged in):', currentUser)
+      console.log('currentUser (logged in):', getCurrentUser())
 
-      // 1. ALL non-admin users — identical for every visitor
+      // 1. All non-admin users
       const { data: users, error: usersErr } = await supabase
         .from('users')
         .select('id, nickname, role')
         .neq('role', 'admin')
 
-      console.log('users letti:', users, usersErr)
+      console.log('users:', users, usersErr)
 
       if (!users || users.length === 0) {
         setTeams([])
@@ -30,42 +30,52 @@ function Ranking() {
         return
       }
 
-      // 2. Teams for those users
+      // 2. Formations for those users (starters only)
       const userIds = users.map(u => u.id)
-      const { data: teamsData, error: teamsErr } = await supabase
-        .from('teams')
-        .select('id, user_id')
+      const { data: formations, error: formErr } = await supabase
+        .from('formations')
+        .select('user_id, goalkeeper, player1, player2, player3, player4')
         .in('user_id', userIds)
 
-      console.log('teams letti:', teamsData, teamsErr)
+      console.log('formations:', formations, formErr)
 
-      // 3. team_players joined with player points
-      const teamIds = (teamsData || []).map(t => t.id)
-      let teamPlayers = []
+      // 3. Collect unique starter player IDs across all formations
+      const starterIds = [
+        ...new Set(
+          (formations || [])
+            .flatMap(f => STARTER_COLS.map(col => f[col]))
+            .filter(Boolean)
+        ),
+      ]
 
-      if (teamIds.length > 0) {
-        const { data: tpData, error: tpErr } = await supabase
-          .from('team_players')
-          .select('team_id, players(id, points)')
-          .in('team_id', teamIds)
+      // 4. Fetch points for those players
+      let playersMap = {}
+      if (starterIds.length > 0) {
+        const { data: players, error: playersErr } = await supabase
+          .from('players')
+          .select('id, points')
+          .in('id', starterIds)
 
-        console.log('team_players letti:', tpData, tpErr)
-        teamPlayers = tpData || []
+        console.log('players:', players, playersErr)
+
+        playersMap = Object.fromEntries((players || []).map(p => [p.id, p.points || 0]))
       }
 
-      // 4. Build ranked list
+      // 5. Build ranking
       const ranked = users.map(user => {
-        const team      = (teamsData || []).find(t => t.user_id === user.id)
-        const myPlayers = team
-          ? teamPlayers.filter(tp => tp.team_id === team.id)
-          : []
-        const points = myPlayers.reduce((sum, tp) => sum + (tp.players?.points || 0), 0)
+        const formation = (formations || []).find(f => f.user_id === user.id)
+        const points = formation
+          ? STARTER_COLS.reduce((sum, col) => {
+              const pid = formation[col]
+              return sum + (pid ? (playersMap[pid] || 0) : 0)
+            }, 0)
+          : 0
 
-        return { nickname: user.nickname, points, count: myPlayers.length }
+        return { nickname: user.nickname, points }
       })
         .sort((a, b) => b.points - a.points)
 
-      console.log('classifica finale:', ranked)
+      console.log('ranking finale:', ranked)
       setTeams(ranked)
       setLoading(false)
     }
@@ -88,7 +98,7 @@ function Ranking() {
         <div className="ranking-empty">
           <p>Nessuna squadra in classifica</p>
           <p className="ranking-empty-hint">
-            Gli utenti devono fare login e selezionare i giocatori
+            Gli utenti devono fare login e salvare la formazione
           </p>
         </div>
       ) : (
