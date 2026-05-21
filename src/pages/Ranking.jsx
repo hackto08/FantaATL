@@ -2,20 +2,6 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 import './Ranking.css'
 
-const LS_TEAMS = 'fantaatl_teams'
-
-function readLS(key, fallback) {
-  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback }
-  catch { return fallback }
-}
-
-function calcPoints(teamSquad, supabasePlayers) {
-  return (teamSquad || []).reduce((sum, tp) => {
-    const sp = supabasePlayers.find(p => p.id === tp.id)
-    return sum + (sp?.points || 0)
-  }, 0)
-}
-
 const MEDALS     = { 1: '🥇', 2: '🥈', 3: '🥉' }
 const RANK_CLASS = { 1: 'rank--gold', 2: 'rank--silver', 3: 'rank--bronze' }
 
@@ -25,43 +11,56 @@ function Ranking() {
 
   useEffect(() => {
     async function buildRanking() {
-      // 1. Fetch player points from Supabase
-      const { data: supabasePlayers, error: playersErr } = await supabase
-        .from('players')
-        .select('id, name, points')
-
-      console.log('Supabase players:', supabasePlayers, playersErr)
-
-      // 2. Fetch non-admin users from Supabase to know who to exclude
-      const { data: supabaseUsers, error: usersErr } = await supabase
+      // 1. Non-admin users
+      const { data: users, error: usersErr } = await supabase
         .from('users')
-        .select('nickname, role')
+        .select('id, nickname, role')
+        .neq('role', 'admin')
 
-      console.log('Supabase users:', supabaseUsers, usersErr)
+      console.log('users:', users, usersErr)
 
-      const adminNicknames = new Set(
-        (supabaseUsers || [])
-          .filter(u => u.role === 'admin')
-          .map(u => u.nickname)
-      )
+      if (!users || users.length === 0) {
+        setTeams([])
+        setLoading(false)
+        return
+      }
 
-      // 3. Read team squads from localStorage (saved by SquadContext)
-      const rawTeams = readLS(LS_TEAMS, {})
-      console.log('localStorage teams:', rawTeams)
+      // 2. Teams for those users
+      const userIds = users.map(u => u.id)
+      const { data: teamsData, error: teamsErr } = await supabase
+        .from('teams')
+        .select('id, user_id')
+        .in('user_id', userIds)
 
-      const players = supabasePlayers || []
+      console.log('teams:', teamsData, teamsErr)
 
-      const ranked = Object.values(rawTeams)
-        .filter(t => !adminNicknames.has(t.nickname))   // exclude admins
-        .filter(t => t.role !== 'admin')                 // also exclude by stored role
-        .map(t => ({
-          nickname: t.nickname,
-          points:   calcPoints(t.squad || [], players),
-          count:    (t.squad || []).length,
-        }))
+      // 3. team_players joined with player points
+      const teamIds = (teamsData || []).map(t => t.id)
+      let teamPlayers = []
+
+      if (teamIds.length > 0) {
+        const { data: tpData, error: tpErr } = await supabase
+          .from('team_players')
+          .select('team_id, players(id, points)')
+          .in('team_id', teamIds)
+
+        console.log('team_players:', tpData, tpErr)
+        teamPlayers = tpData || []
+      }
+
+      // 4. Build ranked list
+      const ranked = users.map(user => {
+        const team      = (teamsData || []).find(t => t.user_id === user.id)
+        const myPlayers = team
+          ? teamPlayers.filter(tp => tp.team_id === team.id)
+          : []
+        const points = myPlayers.reduce((sum, tp) => sum + (tp.players?.points || 0), 0)
+
+        return { nickname: user.nickname, points, count: myPlayers.length }
+      })
         .sort((a, b) => b.points - a.points)
 
-      console.log('Ranked teams:', ranked)
+      console.log('ranked:', ranked)
       setTeams(ranked)
       setLoading(false)
     }

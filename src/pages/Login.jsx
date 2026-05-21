@@ -40,7 +40,7 @@ function Login() {
       return
     }
 
-    const userObj = { nickname: data.nickname, role: data.role || 'user' }
+    const userObj = { id: data.id, nickname: data.nickname, role: data.role || 'user' }
     saveCurrentUser(userObj)
     login(userObj)
     navigate('/home')
