@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react'
+import { supabase } from '../supabase'
 import './Ranking.css'
 
-const LS_TEAMS   = 'fantaatl_teams'
-const LS_PLAYERS = 'fantaatl_players'
+const LS_TEAMS = 'fantaatl_teams'
 
 function readLS(key, fallback) {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback }
   catch { return fallback }
 }
 
-function calcPoints(teamPlayers, adminPlayers) {
-  return (teamPlayers || []).reduce((sum, tp) => {
-    const ap = adminPlayers.find(p => p.id === tp.id)
-    return sum + (ap?.points || 0)
+function calcPoints(teamSquad, supabasePlayers) {
+  return (teamSquad || []).reduce((sum, tp) => {
+    const sp = supabasePlayers.find(p => p.id === tp.id)
+    return sum + (sp?.points || 0)
   }, 0)
 }
 
@@ -20,22 +20,53 @@ const MEDALS     = { 1: '🥇', 2: '🥈', 3: '🥉' }
 const RANK_CLASS = { 1: 'rank--gold', 2: 'rank--silver', 3: 'rank--bronze' }
 
 function Ranking() {
-  const [teams, setTeams] = useState([])
+  const [teams,   setTeams]   = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const rawTeams   = readLS(LS_TEAMS,   {})
-    const adminPlayers = readLS(LS_PLAYERS, [])
+    async function buildRanking() {
+      // 1. Fetch player points from Supabase
+      const { data: supabasePlayers, error: playersErr } = await supabase
+        .from('players')
+        .select('id, name, points')
 
-    const ranked = Object.values(rawTeams)
-      .filter(t => t.role !== 'admin')         // exclude admin accounts
-      .map(t => ({
-        nickname: t.nickname,
-        points:   calcPoints(t.squad || [], adminPlayers),
-        count:    (t.squad || []).length,
-      }))
-      .sort((a, b) => b.points - a.points)
+      console.log('Supabase players:', supabasePlayers, playersErr)
 
-    setTeams(ranked)
+      // 2. Fetch non-admin users from Supabase to know who to exclude
+      const { data: supabaseUsers, error: usersErr } = await supabase
+        .from('users')
+        .select('nickname, role')
+
+      console.log('Supabase users:', supabaseUsers, usersErr)
+
+      const adminNicknames = new Set(
+        (supabaseUsers || [])
+          .filter(u => u.role === 'admin')
+          .map(u => u.nickname)
+      )
+
+      // 3. Read team squads from localStorage (saved by SquadContext)
+      const rawTeams = readLS(LS_TEAMS, {})
+      console.log('localStorage teams:', rawTeams)
+
+      const players = supabasePlayers || []
+
+      const ranked = Object.values(rawTeams)
+        .filter(t => !adminNicknames.has(t.nickname))   // exclude admins
+        .filter(t => t.role !== 'admin')                 // also exclude by stored role
+        .map(t => ({
+          nickname: t.nickname,
+          points:   calcPoints(t.squad || [], players),
+          count:    (t.squad || []).length,
+        }))
+        .sort((a, b) => b.points - a.points)
+
+      console.log('Ranked teams:', ranked)
+      setTeams(ranked)
+      setLoading(false)
+    }
+
+    buildRanking()
   }, [])
 
   return (
@@ -45,7 +76,11 @@ function Ranking() {
         <p className="ranking-subtitle">Ranking ufficiale FantaATL</p>
       </header>
 
-      {teams.length === 0 ? (
+      {loading ? (
+        <div className="ranking-empty">
+          <p>Caricamento classifica...</p>
+        </div>
+      ) : teams.length === 0 ? (
         <div className="ranking-empty">
           <p>Nessuna squadra in classifica</p>
           <p className="ranking-empty-hint">
