@@ -197,6 +197,9 @@ export function SquadProvider({ children }) {
     setFormation((prev) => ({ ...prev, [slot]: null }))
   }
 
+  // Exposed so Formation.jsx can hydrate formation from Supabase
+  function loadFormation(f) { setFormation({ ...EMPTY_FORMATION, ...f }) }
+
   return (
     <SquadContext.Provider value={{
       currentUser,
@@ -205,7 +208,7 @@ export function SquadProvider({ children }) {
       squadLoading,
       squad, starters, reserves, isLocked,
       addPlayer, removePlayer, isAdded, canAdd, tierCount,
-      formation, assignedIds, isAssigned, setFormationSlot, clearFormationSlot,
+      formation, assignedIds, isAssigned, setFormationSlot, clearFormationSlot, loadFormation,
     }}>
       {children}
     </SquadContext.Provider>

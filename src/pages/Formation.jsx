@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSquad } from '../context/SquadContext'
+import { supabase } from '../supabase'
+import { getCurrentUser } from '../utils/auth'
 import './Formation.css'
 
 // Calcio a 5: 1 POR + 4 GIO + 2 RIS
@@ -12,6 +14,8 @@ const SLOT_META = {
   bench1: { label: 'RIS', row: 'bench' },
   bench2: { label: 'RIS', row: 'bench' },
 }
+
+const SLOTS = ['gk', 'p1', 'p2', 'p3', 'p4', 'bench1', 'bench2']
 
 function shortenName(name) {
   if (!name) return ''
@@ -108,10 +112,77 @@ export default function Formation() {
     assignedIds,
     setFormationSlot,
     clearFormationSlot,
+    loadFormation,
     isLocked,
   } = useSquad()
 
   const [activeSlot, setActiveSlot] = useState(null)
+  const [saving,     setSaving]     = useState(false)
+  const [saved,      setSaved]      = useState(false)
+  const [saveError,  setSaveError]  = useState('')
+
+  // Load formation from Supabase once squad is available
+  const hasLoaded = useRef(false)
+  useEffect(() => {
+    if (squad.length === 0 || hasLoaded.current) return
+
+    async function fetchFormation() {
+      const user = getCurrentUser()
+      if (!user?.id) return
+
+      const { data, error } = await supabase
+        .from('formations')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      console.log('formation from Supabase:', data, error)
+
+      if (data) {
+        hasLoaded.current = true
+        const loaded = {}
+        SLOTS.forEach(slot => {
+          const pid = data[slot]
+          loaded[slot] = pid ? (squad.find(p => p.id === pid) || null) : null
+        })
+        loadFormation(loaded)
+      } else {
+        // No saved formation yet — mark as checked so we don't re-fetch
+        hasLoaded.current = true
+      }
+    }
+
+    fetchFormation()
+  }, [squad, loadFormation])
+
+  // Save formation to Supabase
+  async function handleSave() {
+    const user = getCurrentUser()
+    if (!user?.id) return
+
+    setSaving(true)
+    setSaved(false)
+    setSaveError('')
+
+    const payload = { user_id: user.id }
+    SLOTS.forEach(slot => { payload[slot] = formation[slot]?.id || null })
+
+    console.log('saving formation:', payload)
+
+    const { error } = await supabase
+      .from('formations')
+      .upsert(payload, { onConflict: 'user_id' })
+
+    console.log('save formation error:', error)
+    setSaving(false)
+
+    if (error) {
+      setSaveError(`Errore: ${error.message}`)
+    } else {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    }
+  }
 
   function handleCircleClick(slot) {
     if (isLocked) return
@@ -224,6 +295,26 @@ export default function Formation() {
 
       {!isLocked && squad.length > 0 && (
         <p className="formation-hint">Tocca una posizione per assegnare un giocatore</p>
+      )}
+
+      {/* Save button */}
+      {!isLocked && (
+        <div className="formation-save-area">
+          {saved && (
+            <p className="formation-save-success">✓ Formazione salvata correttamente</p>
+          )}
+          {saveError && (
+            <p className="formation-save-error">{saveError}</p>
+          )}
+          <button
+            type="button"
+            className="formation-save-btn"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? 'Salvataggio...' : 'SALVA FORMAZIONE'}
+          </button>
+        </div>
       )}
 
       {activeSlot && (

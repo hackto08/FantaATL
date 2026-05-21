@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
+import { getCurrentUser } from '../utils/auth'
 import './Ranking.css'
 
 const MEDALS     = { 1: '🥇', 2: '🥈', 3: '🥉' }
@@ -11,13 +12,17 @@ function Ranking() {
 
   useEffect(() => {
     async function buildRanking() {
-      // 1. Non-admin users
+      // Debug: who is currently logged in (does NOT affect the query)
+      const currentUser = getCurrentUser()
+      console.log('currentUser (logged in):', currentUser)
+
+      // 1. ALL non-admin users — identical for every visitor
       const { data: users, error: usersErr } = await supabase
         .from('users')
         .select('id, nickname, role')
         .neq('role', 'admin')
 
-      console.log('users:', users, usersErr)
+      console.log('users letti:', users, usersErr)
 
       if (!users || users.length === 0) {
         setTeams([])
@@ -32,7 +37,7 @@ function Ranking() {
         .select('id, user_id')
         .in('user_id', userIds)
 
-      console.log('teams:', teamsData, teamsErr)
+      console.log('teams letti:', teamsData, teamsErr)
 
       // 3. team_players joined with player points
       const teamIds = (teamsData || []).map(t => t.id)
@@ -44,7 +49,7 @@ function Ranking() {
           .select('team_id, players(id, points)')
           .in('team_id', teamIds)
 
-        console.log('team_players:', tpData, tpErr)
+        console.log('team_players letti:', tpData, tpErr)
         teamPlayers = tpData || []
       }
 
@@ -60,7 +65,7 @@ function Ranking() {
       })
         .sort((a, b) => b.points - a.points)
 
-      console.log('ranked:', ranked)
+      console.log('classifica finale:', ranked)
       setTeams(ranked)
       setLoading(false)
     }
