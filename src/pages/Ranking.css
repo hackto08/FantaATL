@@ -158,3 +158,78 @@
     padding: 18px 24px;
   }
 }
+
+/* ── Section wrappers ──────────────────────────────────────── */
+
+.ranking-section {
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 40px;
+}
+
+.ranking-section-title {
+  margin: 0 0 16px;
+  color: #ffffff;
+  font-size: clamp(1.125rem, 5vw, 1.375rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #222;
+}
+
+/* ── Player ranking card extras ────────────────────────────── */
+
+.ranking-card--player {
+  align-items: center;
+}
+
+.rank-player-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rank-player-info .rank-nickname {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rank-player-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.rank-role-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rank-role-badge--portiere {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.rank-role-badge--giocatore {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.rank-tier-badge {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #888;
+  border: 1px solid #2a2a2a;
+}
