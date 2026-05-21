@@ -9,6 +9,7 @@ import Ranking from './pages/Ranking'
 import Rules from './pages/Rules'
 import Formation from './pages/Formation'
 import Admin from './pages/Admin'
+import ViewFormation from './pages/ViewFormation'
 
 function ProtectedRoute({ children }) {
   const user = localStorage.getItem('fantaatl_current_user')
@@ -57,6 +58,7 @@ function App() {
           <Route path="/rules"     element={<ProtectedRoute><Rules /></ProtectedRoute>}     />
           <Route path="/formation" element={<ProtectedRoute><Formation /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+          <Route path="/view-formation/:userId" element={<ProtectedRoute><ViewFormation /></ProtectedRoute>} />
         </Routes>
       </SquadProvider>
     </BrowserRouter>

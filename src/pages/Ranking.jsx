@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { getCurrentUser } from '../utils/auth'
 import './Ranking.css'
@@ -19,6 +20,7 @@ function tierLabel(tier) {
 }
 
 function Ranking() {
+  const navigate   = useNavigate()
   const [teams,    setTeams]    = useState([])
   const [players,  setPlayers]  = useState([])
   const [loading,  setLoading]  = useState(true)
@@ -73,7 +75,7 @@ function Ranking() {
                 return sum + (pid ? (pointsMap[pid] || 0) : 0)
               }, 0)
             : 0
-          return { nickname: user.nickname, points }
+          return { id: user.id, nickname: user.nickname, points }
         }).sort((a, b) => b.points - a.points)
       }
 
@@ -125,10 +127,16 @@ function Ranking() {
                   const pos        = index + 1
                   const medalClass = RANK_CLASS[pos] ?? ''
                   return (
-                    <li key={team.nickname} className={`ranking-card ${medalClass}`}>
+                    <li
+                      key={team.nickname}
+                      className={`ranking-card ranking-card--clickable ${medalClass}`}
+                      onClick={() => navigate(`/view-formation/${team.id}`)}
+                      title={`Vedi formazione di ${team.nickname}`}
+                    >
                       <span className="rank-pos">{MEDALS[pos] ?? `#${pos}`}</span>
                       <span className="rank-nickname">{team.nickname}</span>
                       <span className="rank-points">{team.points} pt</span>
+                      <span className="rank-arrow">›</span>
                     </li>
                   )
                 })}

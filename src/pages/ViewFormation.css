@@ -1,0 +1,256 @@
+/* ── Page ──────────────────────────────────────────────────── */
+
+.vf-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #000000;
+  padding: 20px 20px 48px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Back button ───────────────────────────────────────────── */
+
+.vf-back-btn {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #22c55e;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-bottom: 8px;
+  transition: color 0.15s;
+}
+
+.vf-back-btn:hover { color: #4ade80; }
+
+/* ── Header ────────────────────────────────────────────────── */
+
+.vf-header {
+  text-align: center;
+  margin-bottom: 16px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.vf-title {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: clamp(1.375rem, 6vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.vf-subtitle {
+  margin: 0;
+  color: #555;
+  font-size: 0.8125rem;
+}
+
+/* ── Empty state ───────────────────────────────────────────── */
+
+.vf-empty {
+  text-align: center;
+  padding: 48px 20px;
+}
+
+.vf-empty p {
+  color: #bfbfbf;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ── Football field ────────────────────────────────────────── */
+
+.vf-field {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 2 / 3;
+  background: linear-gradient(180deg, #166534 0%, #15803d 50%, #14532d 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 16px 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.vf-field-center-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-50%);
+}
+
+.vf-field-center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.vf-field-penalty-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  transform: translateX(-50%);
+}
+
+.vf-field-penalty-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 100px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  transform: translateX(-50%);
+}
+
+/* ── Field rows ────────────────────────────────────────────── */
+
+.vf-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Player circle ─────────────────────────────────────────── */
+
+.vf-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  gap: 1px;
+  transition: transform 0.15s;
+}
+
+.vf-circle--filled {
+  background: rgba(0, 0, 0, 0.65);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.vf-circle--empty {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.vf-circle--gk.vf-circle--filled {
+  border-color: #60a5fa;
+  background: rgba(37, 99, 235, 0.35);
+}
+
+.vf-circle--bench {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background: #111 !important;
+  border: 1px solid #333 !important;
+}
+
+.vf-circle--bench.vf-circle--filled {
+  border-color: #444 !important;
+}
+
+.vf-circle-role {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.vf-circle--gk .vf-circle-role { color: #93c5fd; }
+
+.vf-circle-name {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vf-circle-name--empty { color: rgba(255, 255, 255, 0.3); }
+
+.vf-circle-pts {
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: #4ade80;
+  line-height: 1;
+}
+
+/* ── Bench area ────────────────────────────────────────────── */
+
+.vf-bench {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.vf-bench-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #555;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.vf-bench-slots {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+@media (min-width: 480px) {
+  .vf-field  { max-width: 380px; }
+  .vf-bench  { max-width: 380px; }
+  .vf-circle { width: 76px; height: 76px; }
+  .vf-circle-name { font-size: 0.625rem; max-width: 68px; }
+  .vf-circle-pts  { font-size: 0.5625rem; }
+  .vf-circle--bench { width: 68px; height: 68px; }
+}
