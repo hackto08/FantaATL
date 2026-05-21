@@ -131,10 +131,12 @@ export default function Formation() {
     isLocked,
   } = useSquad()
 
-  const [activeSlot, setActiveSlot] = useState(null)
-  const [saving,     setSaving]     = useState(false)
-  const [saved,      setSaved]      = useState(false)
-  const [saveError,  setSaveError]  = useState('')
+  const [activeSlot,  setActiveSlot]  = useState(null)
+  const [saving,      setSaving]      = useState(false)
+  const [saved,       setSaved]       = useState(false)
+  const [saveError,   setSaveError]   = useState('')
+  const [clearing,    setClearing]    = useState(false)
+  const [cleared,     setCleared]     = useState(false)
 
   // Load formation from Supabase once squad is available
   const hasLoaded = useRef(false)
@@ -200,6 +202,37 @@ export default function Formation() {
     } else {
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
+    }
+  }
+
+  // Clear formation — reset all slots to null locally and in Supabase
+  async function handleClear() {
+    const user = getCurrentUser()
+    if (!user?.id) return
+
+    setClearing(true)
+    setSaved(false)
+    setSaveError('')
+    setCleared(false)
+
+    const emptyPayload = { user_id: user.id }
+    SLOTS.forEach(slot => { emptyPayload[SLOT_TO_COL[slot]] = null })
+
+    console.log('clearing formation:', emptyPayload)
+
+    const { error } = await supabase
+      .from('formations')
+      .upsert(emptyPayload, { onConflict: 'user_id' })
+
+    console.log('clear formation error:', error)
+    setClearing(false)
+
+    if (!error) {
+      loadFormation({})          // resets all slots to null in context
+      setCleared(true)
+      setTimeout(() => setCleared(false), 3000)
+    } else {
+      setSaveError(`Errore: ${error.message}`)
     }
   }
 
@@ -316,11 +349,14 @@ export default function Formation() {
         <p className="formation-hint">Tocca una posizione per assegnare un giocatore</p>
       )}
 
-      {/* Save button */}
+      {/* Save / Clear buttons */}
       {!isLocked && (
         <div className="formation-save-area">
           {saved && (
             <p className="formation-save-success">✓ Formazione salvata correttamente</p>
+          )}
+          {cleared && (
+            <p className="formation-save-success">✓ Formazione svuotata correttamente</p>
           )}
           {saveError && (
             <p className="formation-save-error">{saveError}</p>
@@ -329,9 +365,17 @@ export default function Formation() {
             type="button"
             className="formation-save-btn"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || clearing}
           >
             {saving ? 'Salvataggio...' : 'SALVA FORMAZIONE'}
+          </button>
+          <button
+            type="button"
+            className="formation-clear-btn"
+            onClick={handleClear}
+            disabled={saving || clearing}
+          >
+            {clearing ? 'Svuotamento...' : 'SVUOTA FORMAZIONE'}
           </button>
         </div>
       )}

@@ -519,3 +519,28 @@
   font-size: 0.875rem;
   margin: 0;
 }
+
+.formation-clear-btn {
+  width: 100%;
+  max-width: 340px;
+  padding: 14px;
+  background: #1f1f1f;
+  color: #f87171;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.formation-clear-btn:hover:not(:disabled) {
+  background: #2d1515;
+  border-color: rgba(248, 113, 113, 0.65);
+}
+
+.formation-clear-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
