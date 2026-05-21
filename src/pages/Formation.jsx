@@ -17,6 +17,21 @@ const SLOT_META = {
 
 const SLOTS = ['gk', 'p1', 'p2', 'p3', 'p4', 'bench1', 'bench2']
 
+// Maps internal slot keys → Supabase column names
+const SLOT_TO_COL = {
+  gk:     'goalkeeper',
+  p1:     'player1',
+  p2:     'player2',
+  p3:     'player3',
+  p4:     'player4',
+  bench1: 'bench1',
+  bench2: 'bench2',
+}
+// Inverse: Supabase column → internal slot key
+const COL_TO_SLOT = Object.fromEntries(
+  Object.entries(SLOT_TO_COL).map(([slot, col]) => [col, slot])
+)
+
 function shortenName(name) {
   if (!name) return ''
   const parts = name.split(' ')
@@ -142,7 +157,8 @@ export default function Formation() {
         hasLoaded.current = true
         const loaded = {}
         SLOTS.forEach(slot => {
-          const pid = data[slot]
+          const col = SLOT_TO_COL[slot]
+          const pid = data[col]
           loaded[slot] = pid ? (squad.find(p => p.id === pid) || null) : null
         })
         loadFormation(loaded)
@@ -165,7 +181,10 @@ export default function Formation() {
     setSaveError('')
 
     const payload = { user_id: user.id }
-    SLOTS.forEach(slot => { payload[slot] = formation[slot]?.id || null })
+    SLOTS.forEach(slot => {
+      const col = SLOT_TO_COL[slot]
+      payload[col] = formation[slot]?.id || null
+    })
 
     console.log('saving formation:', payload)
 
