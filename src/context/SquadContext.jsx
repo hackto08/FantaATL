@@ -3,6 +3,16 @@ import { TIER_LIMITS, SQUAD_MAX, DEADLINE } from '../data/players'
 import { getCurrentUser, saveCurrentUser, clearCurrentUser } from '../utils/auth'
 import { supabase } from '../supabase'
 
+// Normalise Supabase tier strings to numeric keys (1 | 2 | 3)
+function normalizeTier(tier) {
+  if (typeof tier === 'number') return tier
+  const v = String(tier).toLowerCase().trim()
+  if (v === '1' || v.startsWith('prima'))   return 1
+  if (v === '2' || v.startsWith('seconda')) return 2
+  if (v === '3' || v.startsWith('terza'))   return 3
+  return tier
+}
+
 const SquadContext = createContext()
 
 // ── Formation persisted in localStorage (UI state, no Supabase table) ──────
@@ -78,7 +88,10 @@ export function SquadProvider({ children }) {
 
     console.log('teamPlayers:', teamPlayers, tpErr)
 
-    const loadedSquad = (teamPlayers || []).map(tp => tp.players).filter(Boolean)
+    const loadedSquad = (teamPlayers || [])
+      .map(tp => tp.players)
+      .filter(Boolean)
+      .map(p => ({ ...p, tier: normalizeTier(p.tier) }))
     setSquad(loadedSquad)
 
     // 3. Load formation from localStorage

@@ -4,6 +4,20 @@ import { useSquad } from '../context/SquadContext'
 import { supabase } from '../supabase'
 import './Players.css'
 
+/**
+ * Normalise Supabase tier values to the numeric keys (1 | 2 | 3)
+ * used throughout the app.
+ * Handles: 1, "1", "Prima fascia", "prima", "PRIMA FASCIA", etc.
+ */
+function normalizeTier(tier) {
+  if (typeof tier === 'number') return tier
+  const v = String(tier).toLowerCase().trim()
+  if (v === '1' || v.startsWith('prima'))   return 1
+  if (v === '2' || v.startsWith('seconda')) return 2
+  if (v === '3' || v.startsWith('terza'))   return 3
+  return tier // unknown — leave as-is
+}
+
 const TIER_FILTERS = [
   { value: 0,            label: 'Tutti'          },
   { value: 1,            label: 'Prima fascia'   },
@@ -40,8 +54,11 @@ export default function Players() {
   useEffect(() => {
     async function fetchPlayers() {
       const { data, error } = await supabase.from('players').select('*').order('name')
-      console.log(data, error)
-      setAllPlayers(data || [])
+      console.log('players raw from Supabase:', data, error)
+      // Normalise tier to numeric keys so filters and limits work correctly
+      const normalised = (data || []).map(p => ({ ...p, tier: normalizeTier(p.tier) }))
+      console.log('players normalised:', normalised)
+      setAllPlayers(normalised)
       setLoading(false)
     }
     fetchPlayers()
