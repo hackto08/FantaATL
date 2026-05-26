@@ -481,3 +481,26 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+.admin-btn-secondary {
+  width: 100%;
+  padding: 11px;
+  background: transparent;
+  color: #22c55e;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.admin-btn-secondary:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: #22c55e;
+}
+
+.admin-btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

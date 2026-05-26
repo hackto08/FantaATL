@@ -2,20 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabase'
 import './Admin.css'
 
-// ── localStorage (solo per ranking teams, non rimosso) ───────
-const LS_TEAMS = 'fantaatl_teams'
-
-function readLS(key, fallback) {
-  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback }
-  catch { return fallback }
-}
-
-function calcTeamPoints(teamPlayers, adminPlayers) {
-  return (teamPlayers || []).reduce((sum, tp) => {
-    const ap = adminPlayers.find(p => p.id === tp.id)
-    return sum + (ap?.points || 0)
-  }, 0)
-}
+// Starter slots used for ranking (bench excluded)
+const STARTER_COLS = ['goalkeeper', 'player1', 'player2', 'player3', 'player4']
 
 // ── Constants ────────────────────────────────────────────────
 const POINT_ACTIONS = [
@@ -47,17 +35,19 @@ function RoleBadge({ role }) {
 
 // ── Main component ───────────────────────────────────────────
 export default function Admin() {
-  const [players,      setPlayers]      = useState([])
-  const [users,        setUsers]        = useState([])
-  const [loading,      setLoading]      = useState(true)
-  const [playerForm,   setPlayerForm]   = useState({ name: '', role: 'Giocatore', tier: 1 })
-  const [playerError,  setPlayerError]  = useState('')
-  const [accountForm,  setAccountForm]  = useState({ nickname: '', password: '' })
-  const [accountError, setAccountError] = useState('')
-  const [tab,          setTab]          = useState('players')
-  const [expanded,     setExpanded]     = useState(null)
-  const [search,       setSearch]       = useState('')
-  const [saving,       setSaving]       = useState(false)
+  const [players,        setPlayers]        = useState([])
+  const [users,          setUsers]          = useState([])
+  const [loading,        setLoading]        = useState(true)
+  const [playerForm,     setPlayerForm]     = useState({ name: '', role: 'Giocatore', tier: 1 })
+  const [playerError,    setPlayerError]    = useState('')
+  const [accountForm,    setAccountForm]    = useState({ nickname: '', password: '' })
+  const [accountError,   setAccountError]   = useState('')
+  const [tab,            setTab]            = useState('players')
+  const [expanded,       setExpanded]       = useState(null)
+  const [search,         setSearch]         = useState('')
+  const [saving,         setSaving]         = useState(false)
+  const [rankingData,    setRankingData]    = useState([])
+  const [rankingLoading, setRankingLoading] = useState(false)
 
   // ── Fetch data from Supabase ──────────────────────────────
   const fetchPlayers = useCallback(async () => {
@@ -68,6 +58,63 @@ export default function Admin() {
   const fetchUsers = useCallback(async () => {
     const { data, error } = await supabase.from('users').select('*').order('nickname')
     if (!error && data) setUsers(data)
+  }, [])
+
+  // ── Ranking (same logic as Ranking.jsx) ──────────────────
+  const fetchRanking = useCallback(async () => {
+    setRankingLoading(true)
+
+    const { data: rankUsers, error: uErr } = await supabase
+      .from('users')
+      .select('id, nickname, role')
+      .neq('role', 'admin')
+    console.log('admin ranking — users:', rankUsers, uErr)
+
+    if (!rankUsers || rankUsers.length === 0) {
+      setRankingData([])
+      setRankingLoading(false)
+      return
+    }
+
+    const userIds = rankUsers.map(u => u.id)
+    const { data: formations, error: fErr } = await supabase
+      .from('formations')
+      .select('user_id, goalkeeper, player1, player2, player3, player4')
+      .in('user_id', userIds)
+    console.log('admin ranking — formations:', formations, fErr)
+
+    const starterIds = [
+      ...new Set(
+        (formations || [])
+          .flatMap(f => STARTER_COLS.map(col => f[col]))
+          .filter(Boolean)
+      ),
+    ]
+
+    let pointsMap = {}
+    if (starterIds.length > 0) {
+      const { data: pts, error: pErr } = await supabase
+        .from('players')
+        .select('id, points')
+        .in('id', starterIds)
+      console.log('admin ranking — players:', pts, pErr)
+      pointsMap = Object.fromEntries((pts || []).map(p => [p.id, p.points || 0]))
+    }
+
+    const ranked = rankUsers.map(user => {
+      const formation = (formations || []).find(f => f.user_id === user.id)
+      const points = formation
+        ? STARTER_COLS.reduce((sum, col) => {
+            const pid = formation[col]
+            return sum + (pid ? (pointsMap[pid] || 0) : 0)
+          }, 0)
+        : 0
+      return { nickname: user.nickname, points }
+    }).sort((a, b) => b.points - a.points)
+
+    console.log('admin ranking — classifica calcolata:', ranked)
+    setRankingData(ranked)
+    setRankingLoading(false)
   }, [])
 
   useEffect(() => {
@@ -144,14 +191,8 @@ export default function Admin() {
     setSaving(false)
   }
 
-  async function deleteAccount(id, nickname) {
+  async function deleteAccount(id) {
     await supabase.from('users').delete().eq('id', id)
-    // Also clean up their localStorage team
-    try {
-      const teams = readLS(LS_TEAMS, {})
-      delete teams[nickname]
-      localStorage.setItem(LS_TEAMS, JSON.stringify(teams))
-    } catch { /* ignore */ }
     await fetchUsers()
   }
 
@@ -159,15 +200,6 @@ export default function Admin() {
   const filteredPlayers = search.trim()
     ? players.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
     : players
-
-  const allTeams = readLS(LS_TEAMS, {})
-  const sortedTeams = Object.values(allTeams)
-    .map(t => ({
-      nickname: t.nickname,
-      players:  t.squad || [],
-      points:   calcTeamPoints(t.squad || [], players),
-    }))
-    .sort((a, b) => b.points - a.points)
 
   const MEDALS = { 0: '🥇', 1: '🥈', 2: '🥉' }
 
@@ -183,7 +215,11 @@ export default function Admin() {
         {TABS.map(t => (
           <button key={t.id} type="button"
             className={`admin-tab${tab === t.id ? ' admin-tab--active' : ''}`}
-            onClick={() => { setTab(t.id); setSearch('') }}>
+            onClick={() => {
+              setTab(t.id)
+              setSearch('')
+              if (t.id === 'ranking') fetchRanking()
+            }}>
             {t.label}
           </button>
         ))}
@@ -300,22 +336,35 @@ export default function Admin() {
       {!loading && tab === 'ranking' && (
         <div className="admin-section">
           <div className="admin-card">
-            <h2 className="admin-card-title">Classifica live</h2>
-            {sortedTeams.length === 0 ? (
-              <p className="admin-section-hint">Nessuna squadra registrata ancora.</p>
+            <h2 className="admin-card-title">Classifica reale</h2>
+            <p className="admin-section-hint">
+              Punti calcolati dai 5 titolari in formazione (goalkeeper + player1–4)
+            </p>
+
+            {rankingLoading ? (
+              <div className="admin-loading" style={{ padding: '24px 0' }}>
+                <span className="admin-spinner" /> Calcolo classifica…
+              </div>
+            ) : rankingData.length === 0 ? (
+              <p className="admin-section-hint">Nessuna formazione salvata ancora.</p>
             ) : (
               <ul className="admin-ranking-list">
-                {sortedTeams.map((team, i) => (
+                {rankingData.map((team, i) => (
                   <li key={team.nickname}
                     className={`admin-rank-card${i < 3 ? ` admin-rank-card--${['gold','silver','bronze'][i]}` : ''}`}>
                     <span className="admin-rank-pos">{MEDALS[i] ?? `#${i + 1}`}</span>
                     <span className="admin-rank-name">{team.nickname}</span>
                     <span className="admin-rank-points">{team.points} pt</span>
-                    <span className="admin-rank-squad">{team.players.length}/7 gio.</span>
                   </li>
                 ))}
               </ul>
             )}
+
+            <button type="button" className="admin-btn-secondary"
+              onClick={fetchRanking} disabled={rankingLoading}
+              style={{ marginTop: '16px' }}>
+              🔄 Aggiorna classifica
+            </button>
           </div>
         </div>
       )}
@@ -358,7 +407,7 @@ export default function Admin() {
                     <span className="admin-account-password">●●●●●●</span>
                   </div>
                   <button type="button" className="admin-remove-btn"
-                    onClick={() => deleteAccount(user.id, user.nickname)}>✕</button>
+                    onClick={() => deleteAccount(user.id)}>✕</button>
                 </li>
               ))}
             </ul>
