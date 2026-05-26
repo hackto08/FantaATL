@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useSquad } from '../context/SquadContext'
 import { TIER_LABELS, SQUAD_MAX, TIER_LIMITS } from '../data/players'
+import BackButton from '../components/BackButton'
 import './Team.css'
 
 function TierBadge({ tier }) {
@@ -25,6 +26,7 @@ export default function Team() {
 
   return (
     <main className="team-page">
+      <BackButton />
       {isLocked ? (
         <div className="team-deadline team-deadline--locked">
           🔒 Mercato chiuso — formazioni bloccate

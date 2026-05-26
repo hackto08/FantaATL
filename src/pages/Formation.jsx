@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useSquad } from '../context/SquadContext'
 import { supabase } from '../supabase'
 import { getCurrentUser } from '../utils/auth'
+import BackButton from '../components/BackButton'
 import './Formation.css'
 
 // Calcio a 5: 1 POR + 4 GIO + 2 RIS
@@ -263,6 +264,7 @@ export default function Formation() {
 
   return (
     <main className="formation-page">
+      <BackButton />
       {isLocked ? (
         <div className="formation-banner formation-banner--locked">🔒 Formazioni bloccate</div>
       ) : (

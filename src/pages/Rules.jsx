@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton'
 import './Rules.css'
 
 const RULES = [
@@ -14,6 +15,7 @@ const RULES = [
 function Rules() {
   return (
     <main className="rules-page">
+      <BackButton />
       <header className="rules-header">
         <h1 className="rules-title">Regolamento FantaATL</h1>
         <p className="rules-subtitle">Tutti i punti del fantasy game ufficiale</p>

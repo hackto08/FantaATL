@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { supabase } from '../supabase'
+import BackButton from '../components/BackButton'
 import './ViewFormation.css'
 
 const STARTER_COLS = ['player1', 'player2', 'player3', 'player4', 'gk']
@@ -70,8 +71,7 @@ function PlayerCircle({ slotLabel, player, isBench, isGk }) {
 }
 
 export default function ViewFormation() {
-  const { userId }  = useParams()
-  const navigate    = useNavigate()
+  const { userId } = useParams()
 
   const [nickname,    setNickname]    = useState('')
   const [formation,   setFormation]   = useState(null)   // null = loading
@@ -131,9 +131,7 @@ export default function ViewFormation() {
 
   return (
     <main className="vf-page">
-      <button type="button" className="vf-back-btn" onClick={() => navigate(-1)}>
-        ← Indietro
-      </button>
+      <BackButton />
 
       <header className="vf-header">
         <h1 className="vf-title">

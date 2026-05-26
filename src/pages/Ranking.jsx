@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { getCurrentUser } from '../utils/auth'
+import BackButton from '../components/BackButton'
 import './Ranking.css'
 
 const STARTER_COLS = ['goalkeeper', 'player1', 'player2', 'player3', 'player4']
@@ -99,6 +100,7 @@ function Ranking() {
 
   return (
     <main className="ranking-page">
+      <BackButton />
       <header className="ranking-header">
         <h1 className="ranking-title">Classifica</h1>
         <p className="ranking-subtitle">Ranking ufficiale FantaATL</p>

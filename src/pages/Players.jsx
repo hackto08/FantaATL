@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { TIER_LABELS, TIER_LIMITS, SQUAD_MAX } from '../data/players'
 import { useSquad } from '../context/SquadContext'
 import { supabase } from '../supabase'
+import BackButton from '../components/BackButton'
 import './Players.css'
 
 /**
@@ -83,6 +84,7 @@ export default function Players() {
 
   return (
     <main className="players-page">
+      <BackButton />
       <DeadlineBanner isLocked={isLocked} />
 
       <header className="players-header">
