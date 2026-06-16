@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../supabase'
 import './Admin.css'
 
@@ -14,6 +14,16 @@ const POINT_ACTIONS = [
   { label: '+5 Esultanza',     delta: +5,  positive: true  },
   { label: '-5 Ammonizione',   delta: -5,  positive: false },
   { label: '-10 Eliminazione', delta: -10, positive: false },
+]
+
+const BONUS_ATL_ACTIONS = [
+  { label: '🎭 Bonus Maschera (+6)',        delta: +6 },
+  { label: '🤳 Bonus Selfie ATL (+6)',      delta: +6 },
+  { label: '🥳 Esultanza di Squadra (+2)',  delta: +2 },
+  { label: '😘 Bacio alla Telecamera (+2)', delta: +2 },
+  { label: '🏖️ Tuffo sulla Sabbia (+2)',    delta: +2 },
+  { label: '🎤 Intervista MVP (+3)',        delta: +3 },
+  { label: '🤫 Esultanza Silenzio (+2)',    delta: +2 },
 ]
 
 const TIER_LABELS = { 1: 'Prima fascia', 2: 'Seconda fascia', 3: 'Terza fascia' }
@@ -48,6 +58,8 @@ export default function Admin() {
   const [saving,         setSaving]         = useState(false)
   const [rankingData,    setRankingData]    = useState([])
   const [rankingLoading, setRankingLoading] = useState(false)
+  const [bonusFeedback,  setBonusFeedback]  = useState(null)
+  const bonusFeedbackTimer = useRef(null)
 
   // ── Fetch data from Supabase ──────────────────────────────
   const fetchPlayers = useCallback(async () => {
@@ -168,6 +180,17 @@ export default function Admin() {
     if (error) {
       // Revert on error
       setPlayers(prev => prev.map(p => p.id === player.id ? { ...p, points: player.points } : p))
+      return false
+    }
+    return true
+  }
+
+  async function assignBonusAtl(player, delta) {
+    const success = await addPoints(player, delta)
+    if (success) {
+      setBonusFeedback({ playerId: player.id, message: 'Bonus assegnato correttamente' })
+      if (bonusFeedbackTimer.current) clearTimeout(bonusFeedbackTimer.current)
+      bonusFeedbackTimer.current = setTimeout(() => setBonusFeedback(null), 3000)
     }
   }
 
@@ -206,6 +229,51 @@ export default function Admin() {
   // ── Render ────────────────────────────────────────────────
   return (
     <main className="admin-page">
+      <style>{`
+        .admin-bonus-atl-card {
+          margin: 0 16px 14px;
+          padding: 14px;
+          background: #0a0a0a;
+          border: 1px solid rgba(34, 197, 94, 0.45);
+          border-radius: 12px;
+        }
+        .admin-bonus-atl-title {
+          margin: 0 0 12px;
+          color: #fff;
+          font-size: 0.9rem;
+          font-weight: 700;
+        }
+        .admin-bonus-atl-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+        .admin-bonus-atl-btn {
+          padding: 11px 12px;
+          border: none;
+          border-radius: 10px;
+          background: #22c55e;
+          color: #fff;
+          font-family: inherit;
+          font-size: 0.78rem;
+          font-weight: 700;
+          cursor: pointer;
+          text-align: left;
+          transition: background 0.15s, transform 0.15s;
+        }
+        .admin-bonus-atl-btn:hover { background: #16a34a; }
+        .admin-bonus-atl-btn:active { transform: scale(0.98); }
+        .admin-bonus-atl-feedback {
+          margin: 12px 0 0;
+          color: #22c55e;
+          font-size: 0.8125rem;
+          font-weight: 600;
+          text-align: center;
+        }
+        @media (min-width: 400px) {
+          .admin-bonus-atl-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+      `}</style>
       <header className="admin-header">
         <h1 className="admin-title">Pannello Admin ATL</h1>
         <p className="admin-subtitle">Gestisci giocatori, punti e account</p>
@@ -316,15 +384,33 @@ export default function Admin() {
                   </div>
                 </button>
                 {expanded === player.id && (
-                  <div className="admin-action-grid">
-                    {POINT_ACTIONS.map(action => (
-                      <button key={action.label} type="button"
-                        className={`admin-action-btn${action.positive ? ' admin-action-btn--pos' : ' admin-action-btn--neg'}`}
-                        onClick={() => addPoints(player, action.delta)}>
-                        {action.label}
-                      </button>
-                    ))}
-                  </div>
+                  <>
+                    <div className="admin-action-grid">
+                      {POINT_ACTIONS.map(action => (
+                        <button key={action.label} type="button"
+                          className={`admin-action-btn${action.positive ? ' admin-action-btn--pos' : ' admin-action-btn--neg'}`}
+                          onClick={() => addPoints(player, action.delta)}>
+                          {action.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="admin-bonus-atl-card">
+                      <h3 className="admin-bonus-atl-title">🔥 BONUS ATL</h3>
+                      <div className="admin-bonus-atl-grid">
+                        {BONUS_ATL_ACTIONS.map(action => (
+                          <button key={action.label} type="button"
+                            className="admin-bonus-atl-btn"
+                            onClick={() => assignBonusAtl(player, action.delta)}>
+                            {action.label}
+                          </button>
+                        ))}
+                      </div>
+                      {bonusFeedback?.playerId === player.id && (
+                        <p className="admin-bonus-atl-feedback">{bonusFeedback.message}</p>
+                      )}
+                    </div>
+                  </>
                 )}
               </li>
             ))}
