@@ -111,4 +111,9 @@ export const SQUAD_MAX   = 7
 export const STARTER_MAX = 5
 export const RESERVE_MAX = 2
 
-export const DEADLINE = new Date('2026-06-21T09:29:00')
+export function isMarketLocked() {
+  const now = new Date()
+  const deadline = new Date()
+  deadline.setHours(11, 0, 0, 0)
+  return now >= deadline
+}

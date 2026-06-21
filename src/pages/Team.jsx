@@ -29,11 +29,11 @@ export default function Team() {
       <BackButton />
       {isLocked ? (
         <div className="team-deadline team-deadline--locked">
-          🔒 Mercato chiuso — formazioni bloccate
+          Mercato bloccato dalle ore 11:00
         </div>
       ) : (
         <div className="team-deadline">
-          ⏰ Formazioni bloccate il <strong>21 giugno alle 09:29</strong>
+          ⏰ Mercato bloccato oggi alle <strong>11:00</strong>
         </div>
       )}
 

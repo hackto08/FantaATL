@@ -29,11 +29,11 @@ const TIER_FILTERS = [
 
 function DeadlineBanner({ isLocked }) {
   if (isLocked) {
-    return <div className="deadline-banner deadline-banner--locked">🔒 Mercato chiuso — formazioni bloccate</div>
+    return <div className="deadline-banner deadline-banner--locked">Mercato bloccato dalle ore 11:00</div>
   }
   return (
     <div className="deadline-banner">
-      ⏰ Formazioni bloccate il <strong>21 giugno alle 09:29</strong>
+      ⏰ Mercato bloccato oggi alle <strong>11:00</strong>
     </div>
   )
 }
@@ -75,7 +75,7 @@ export default function Players() {
       : allPlayers.filter((p) => p.role === filter)
 
   function blockReason(player) {
-    if (isLocked)                                           return 'Mercato chiuso'
+    if (isLocked)                                           return 'Mercato bloccato'
     if (isAdded(player.id))                                return null
     if (squadFull)                                          return 'Rosa completa'
     if (tierCount(player.tier) >= TIER_LIMITS[player.tier]) return 'Limite fascia'
@@ -174,7 +174,7 @@ export default function Players() {
                     className="player-btn player-btn--remove"
                     onClick={() => removePlayer(player.id)}
                     disabled={isLocked}
-                    title={isLocked ? 'Mercato chiuso' : 'Rimuovi'}
+                    title={isLocked ? 'Mercato bloccato' : 'Rimuovi'}
                   >
                     ✕
                   </button>

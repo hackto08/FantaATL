@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { TIER_LIMITS, SQUAD_MAX, DEADLINE } from '../data/players'
+import { TIER_LIMITS, SQUAD_MAX, isMarketLocked } from '../data/players'
 import { getCurrentUser, saveCurrentUser, clearCurrentUser } from '../utils/auth'
 import { supabase } from '../supabase'
 
@@ -47,7 +47,7 @@ export function SquadProvider({ children }) {
   const [formation,    setFormation]    = useState({ ...EMPTY_FORMATION })
   const [squadLoading, setSquadLoading] = useState(false)
 
-  const isLocked = new Date() >= DEADLINE
+  const isLocked = isMarketLocked()
 
   // ── Load squad from Supabase ────────────────────────────────────────────
   const loadSquad = useCallback(async (userObj) => {
