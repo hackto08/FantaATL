@@ -29,11 +29,11 @@ const TIER_FILTERS = [
 
 function DeadlineBanner({ isLocked }) {
   if (isLocked) {
-    return <div className="deadline-banner deadline-banner--locked">Mercato bloccato dalle ore 11:00</div>
+    return <div className="deadline-banner deadline-banner--locked">Mercato bloccato dalle ore 12:00</div>
   }
   return (
     <div className="deadline-banner">
-      ⏰ Mercato bloccato oggi alle <strong>11:00</strong>
+      ⏰ Mercato bloccato oggi alle <strong>12:00</strong>
     </div>
   )
 }

@@ -114,6 +114,6 @@ export const RESERVE_MAX = 2
 export function isMarketLocked() {
   const now = new Date()
   const deadline = new Date()
-  deadline.setHours(11, 0, 0, 0)
+  deadline.setHours(12, 0, 0, 0)
   return now >= deadline
 }

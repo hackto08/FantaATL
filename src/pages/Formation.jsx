@@ -43,7 +43,7 @@ function shortenName(name) {
 function isFormationLocked() {
   const now = new Date()
   const deadline = new Date()
-  deadline.setHours(11, 0, 0, 0)
+  deadline.setHours(12, 0, 0, 0)
   return now >= deadline
 }
 
@@ -276,10 +276,10 @@ export default function Formation() {
     <main className="formation-page">
       <BackButton />
       {formationLocked ? (
-        <div className="formation-banner formation-banner--locked">Formazioni bloccate dalle ore 11:00</div>
+        <div className="formation-banner formation-banner--locked">Formazioni bloccate dalle ore 12:00</div>
       ) : (
         <div className="formation-banner">
-          ⏰ Formazioni bloccate oggi alle <strong>11:00</strong>
+          ⏰ Formazioni bloccate oggi alle <strong>12:00</strong>
         </div>
       )}
 
