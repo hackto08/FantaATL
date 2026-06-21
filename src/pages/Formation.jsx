@@ -40,6 +40,13 @@ function shortenName(name) {
   return `${parts[0][0]}. ${parts.slice(1).join(' ')}`
 }
 
+function isFormationLocked() {
+  const now = new Date()
+  const deadline = new Date()
+  deadline.setHours(11, 0, 0, 0)
+  return now >= deadline
+}
+
 function PlayerCircle({ slot, player, isActive, onClick, isLocked }) {
   const meta    = SLOT_META[slot]
   const isBench = meta.row === 'bench'
@@ -129,8 +136,9 @@ export default function Formation() {
     setFormationSlot,
     clearFormationSlot,
     loadFormation,
-    isLocked,
   } = useSquad()
+
+  const formationLocked = isFormationLocked()
 
   const [activeSlot,  setActiveSlot]  = useState(null)
   const [saving,      setSaving]      = useState(false)
@@ -176,6 +184,7 @@ export default function Formation() {
 
   // Save formation to Supabase
   async function handleSave() {
+    if (formationLocked) return
     const user = getCurrentUser()
     if (!user?.id) return
 
@@ -208,6 +217,7 @@ export default function Formation() {
 
   // Clear formation — reset all slots to null locally and in Supabase
   async function handleClear() {
+    if (formationLocked) return
     const user = getCurrentUser()
     if (!user?.id) return
 
@@ -238,7 +248,7 @@ export default function Formation() {
   }
 
   function handleCircleClick(slot) {
-    if (isLocked) return
+    if (formationLocked) return
     if (formation[slot]) {
       if (activeSlot === slot) {
         clearFormationSlot(slot)
@@ -265,11 +275,11 @@ export default function Formation() {
   return (
     <main className="formation-page">
       <BackButton />
-      {isLocked ? (
-        <div className="formation-banner formation-banner--locked">🔒 Formazioni bloccate</div>
+      {formationLocked ? (
+        <div className="formation-banner formation-banner--locked">Formazioni bloccate dalle ore 11:00</div>
       ) : (
         <div className="formation-banner">
-          ⏰ Formazioni bloccate il <strong>21 giugno alle 09:29</strong>
+          ⏰ Formazioni bloccate oggi alle <strong>11:00</strong>
         </div>
       )}
 
@@ -301,7 +311,7 @@ export default function Formation() {
               player={formation[slot]}
               isActive={activeSlot === slot}
               onClick={() => handleCircleClick(slot)}
-              isLocked={isLocked}
+              isLocked={formationLocked}
             />
           ))}
         </div>
@@ -314,7 +324,7 @@ export default function Formation() {
               player={formation[slot]}
               isActive={activeSlot === slot}
               onClick={() => handleCircleClick(slot)}
-              isLocked={isLocked}
+              isLocked={formationLocked}
             />
           ))}
         </div>
@@ -326,7 +336,7 @@ export default function Formation() {
             player={formation.gk}
             isActive={activeSlot === 'gk'}
             onClick={() => handleCircleClick('gk')}
-            isLocked={isLocked}
+            isLocked={formationLocked}
           />
         </div>
       </div>
@@ -341,46 +351,44 @@ export default function Formation() {
               player={formation[slot]}
               isActive={activeSlot === slot}
               onClick={() => handleCircleClick(slot)}
-              isLocked={isLocked}
+              isLocked={formationLocked}
             />
           ))}
         </div>
       </div>
 
-      {!isLocked && squad.length > 0 && (
+      {!formationLocked && squad.length > 0 && (
         <p className="formation-hint">Tocca una posizione per assegnare un giocatore</p>
       )}
 
       {/* Save / Clear buttons */}
-      {!isLocked && (
-        <div className="formation-save-area">
-          {saved && (
-            <p className="formation-save-success">✓ Formazione salvata correttamente</p>
-          )}
-          {cleared && (
-            <p className="formation-save-success">✓ Formazione svuotata correttamente</p>
-          )}
-          {saveError && (
-            <p className="formation-save-error">{saveError}</p>
-          )}
-          <button
-            type="button"
-            className="formation-save-btn"
-            onClick={handleSave}
-            disabled={saving || clearing}
-          >
-            {saving ? 'Salvataggio...' : 'SALVA FORMAZIONE'}
-          </button>
-          <button
-            type="button"
-            className="formation-clear-btn"
-            onClick={handleClear}
-            disabled={saving || clearing}
-          >
-            {clearing ? 'Svuotamento...' : 'SVUOTA FORMAZIONE'}
-          </button>
-        </div>
-      )}
+      <div className="formation-save-area">
+        {saved && (
+          <p className="formation-save-success">✓ Formazione salvata correttamente</p>
+        )}
+        {cleared && (
+          <p className="formation-save-success">✓ Formazione svuotata correttamente</p>
+        )}
+        {saveError && (
+          <p className="formation-save-error">{saveError}</p>
+        )}
+        <button
+          type="button"
+          className="formation-save-btn"
+          onClick={handleSave}
+          disabled={formationLocked || saving || clearing}
+        >
+          {saving ? 'Salvataggio...' : 'SALVA FORMAZIONE'}
+        </button>
+        <button
+          type="button"
+          className="formation-clear-btn"
+          onClick={handleClear}
+          disabled={formationLocked || saving || clearing}
+        >
+          {clearing ? 'Svuotamento...' : 'SVUOTA FORMAZIONE'}
+        </button>
+      </div>
 
       {activeSlot && (
         <PlayerPicker
